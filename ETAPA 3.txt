@@ -1,0 +1,2 @@
+ETAPA 3 - (NAO CONSEGUI ULTILIZAR O DOCKER EM CASA)
+Por conta da variedade de dados e por nao manter um padrao seria melhor ser utilizado o NoSQL, um exemplo seria uma area de trabalho onde cada um teria uma quantidade de arquivos distintas e tipos de arquivos distintos também, ou uma pasta de entrega de TCC que seria adicionados arquivos de textos, videos, fotos, executaveis e etc.

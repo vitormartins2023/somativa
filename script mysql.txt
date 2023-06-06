@@ -1,0 +1,95 @@
+create database formativaHogwarts;
+use formativaHogwarts;
+alter table usuarios 
+add foto varchar(300) not null;
+
+alter table usuarios 
+add telefone bigint not null;	
+
+create table tarefas(
+id bigint not null auto_increment,
+nome_tarefa varchar(200) not null,
+descricao_tarefa varchar(200) not null,
+data_execucao datetime not null,
+data_abertura datetime not null,
+data_fim datetime not null,
+localFK bigint not null,
+solicitanteFK bigint not null,
+primary key(id),
+foreign key(localFK) references locais(id),
+foreign key(solicitanteFK) references usuarios(id)
+);
+insert to(
+
+create table responsaveisTarefas(
+id bigint not null auto_increment,
+tarefaFK bigint not null,
+id_usuariosFK bigint not null,
+primary key(id),
+foreign key(tarefaFK) references tarefas(id),
+foreign key(id_usuariosFK) references usuarios(id)
+);
+
+create table progressoTarefa(
+id bigint not null auto_increment,
+status varchar(100) not null,
+primary key(id)
+);
+
+create table consultasTarefas(
+id bigint not null auto_increment,
+tarefaFK bigint not null,
+dateconsultas datetime,
+statusFK bigint not null,
+comentario varchar(400) not null,
+primary key(id),
+foreign key(tarefaFK) references tarefas(id),
+foreign key(statusFK) references progressoTarefa(id)
+);
+
+create table imagensconsltas(
+id bigint not null auto_increment,
+tarefaFK bigint not null,
+statusFK bigint not null,
+imagem_url text,
+primary key(id),
+foreign key(tarefaFK) references tarefas(id),
+foreign key(statusFK) references progressoTarefa(id)
+);
+
+INSERT INTO tarefas VALUES (1,'limpara sala','fazer a limpeza de todas as salas', '2023-06-06 10:15:00', '2023-06-06 06:00:00', '2023-06-07 00:00:00', 2, 2),(2,'desligar aparelhos','Desligar todos os aparelhos', '2023-09-07 23:00:00', '2023-09-07 21:00:00', '2023-09-10 00:00:00', 1, 1),(3,'fazer algo','fazer algo nas salas', '2022-06-11 10:15:00', '2022-06-12 06:00:00', '2022-06-13 00:00:00', 3, 3),(4,'fazer algo novo','fazer alguma nova coisa', '2023-07-15 10:15:00', '2023-07-16 06:00:00','2023-07-18 00:00:00', 4, 4),(6,'fazer mais algo novo','fazer mais alguma nova coisa', '2023-09-18 10:15:00', '2023-09-20 06:00:00','2023-09-23 00:00:00', 4, 1),(5,'algo novo','coisa nova', '2023-01-18 10:15:00', '2023-01-16 06:00:00','2023-01-20 00:00:00', 4, 5);
+INSERT INTO progressotarefa VALUES(1, 'Aberta'),(2,'Em andamento'),(3,'Concluida'),(4,'Encerrada');
+INSERT INTO imagensconsltas VALUES(1,1,1,'imagem.png'),(2,1,1,'imagem.png'),(3,1,1,'imagem.png'),(4,2,1,'imagem.png'),(5,2,1,'imagem.png'),(6,3,4,'imagem.png'),(7,3,4,'imagem.png'),(8,4,1,'imagem.png'),(9,4,1,'imagem.png'),(10,5,3,'imagem.png'),(11,5,3,'imagem.png'),(12,6,1,'imagem.PNG'),(13,6,1,'imagem.PNG');
+INSERT INTO consultastarefas VALUES(1,1,'2023-06-04',1,'aguardando o inicio da semana'),(2,2,'2023-06-04',1,'aguardando o inicio da semana'),(3,3,'2022-06-11',1,'aguardando o inicio'),(4,3,'2022-06-12',2,'executando'),(5,3,'2022-06-13',3,'finalizada'),(6,4,'2023-06-04',1,'aguardando o inicio'),(7,5,'2023-06-04',4,'mesmo com algumas dificuldades a tarefa foi finalizada');
+INSERT INTO responsaveistarefas VALUES(1,1,1),(2,1,3),(3,2,5),(4,2,2),(5,2,1),(6,3,3),(7,3,1),(8,3,4),(9,3,2),(10,4,1),(11,5,2),(12,5,6),(13,5,1),(14,6,6);
+
+#1 
+select *from consultastarefas c join progressotarefa p on c.statusFK = p.id where p.status = 'Aberta';
+
+#2
+select *from locais l where l.id not in (select l.id from locais l join tarefas t on l.id = t.localFK);
+
+#3
+select *from usuarios u where u.id not in(select u.id from usuarios u join responsaveistarefas r on u.id = r.id_usuariosFK);
+
+#4
+select *from eventos e where e.inicio > now() and e.localFk not in(select localFK from tarefas);  
+
+#5
+select count(*) as tarefas , l.id from locais l join tarefas t on l.id =t.localFK group by t.localFK; 
+
+#6
+select count(*)as tarefas_nao_concluidas, l.id from locais l join tarefas t on l.id = t.localFK
+			join consultastarefas c on c.tarefaFK = t.id
+            join progressotarefa p on c.statusFK = p.id where p.status not in( 'Concluido', 'Encerrada')  group by l.id;
+
+#7
+select count(*) as Tarefas , u.id from usuarios u join responsaveistarefas r on u.id =id_usuariosFK group by id_usuariosFK; 
+
+#8
+select count(*) as Tarefas , u.id from usuarios u join responsaveistarefas r on u.id = r.id_usuariosFK
+			join consultastarefas c on c.tarefaFK = r.tarefaFK 
+            join progressotarefa p on c.statusFK =p.id 
+			where p.status not in( 'Concluido', 'Encerrada')  group by u.id; 
+ #9
+select *, AVG(d.qnt) from locais l join (select localFK, month(data_abertura)as mes,count(*) as qnt from tarefas group by mes,localFK) d on l.id = d.localFK group by d.mes,l.id;           

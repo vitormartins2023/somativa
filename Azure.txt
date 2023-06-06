@@ -1,0 +1,4 @@
+vitor
+Somativa@2023
+
+professor em locaiFK da tabela TAREFAS no meu mysql estava puxando ocupação que está incorreto mas quando eu estava subindo o banco de dados para o azure eu percebi isso e alterei beleza, mas como ficou muita coisa depentede no tarefas nao deu tempo de dar drop porem no azure está certo
